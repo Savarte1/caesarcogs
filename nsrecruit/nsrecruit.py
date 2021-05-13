@@ -1,41 +1,35 @@
 from redbot.core import commands
-import sans
 from sans.api import Api as nsapi
 from sans.utils import pretty_string
-import xmltodict
-import json
-import re
+import xmltodict as x2d
+#import json, sans
 
 class NSRecruit(commands.Cog):
     """NSRecruiter"""
-    
     nsapi.agent = "CAESAR, by Artevenia"
+
+    done=[]
+    def complete(self, other):
+        self.done.append(other)
+        return 1
+
+    def nope(self, nation):
+        if any([t.isdigit()for t in nation]) or nation in self.done:
+            return 1
 
     @commands.command()
     async def recruit(self, ctx):
         """Gives a list of up to 8 nations to send recruitment telegrams"""
-        def hasNumbers(inputString):
-            return bool(re.search(r'\d', inputString))
-            
-        req = nsapi("happenings", limit="15", filter='founding')
 
-        happenings = await req
+        h = await nsapi("happenings", limit="15", filter='founding')
+        events = x2d.parse(pretty_string(h))["WORLD"]["HAPPENINGS"]["EVENT"]
 
-        foundings = xmltodict.parse(pretty_string(happenings))
+        nations, e_iter = list(), events.__iter__()
+        nation = e_iter.__next__()
 
-        nations = foundings["WORLD"]["HAPPENINGS"]["EVENT"]
+        for n in range(8):
+            while self.nope(nation):
+              nation = e_iter.__next__()['TEXT'].split("@@")[1]
+            self.complete(nation) and nations.append(nation)
 
-        nation_string = ""
-
-        nationnumber = 0
-
-        for founding in nations:
-            nation = founding['TEXT'].split("@@")
-            if nationnumber == 8:
-                break
-            if not hasNumbers(nation[1]):
-                nationnumber += 1
-                nation_string += (nation[1] + ", ")
-
-        
-        await ctx.send(nation_string)
+        await ctx.send(', '.join(nations))
