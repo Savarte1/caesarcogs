@@ -37,7 +37,7 @@ async def review(channel, e):
       try:
         e.add_field(name=str(i+1), value=', '.join([d_iter.__next__()for _ in range(8)]), inline=False)
       except StopIteration:
-        e.add_field(name=str(len(done)//8+1), value=', '.join(done[-(len(done)%8):]), inline=False)
+        len(done)%8 and e.add_field(name=str(len(done)//8+1), value=', '.join(done[-(len(done)%8):]), inline=False)
     await channel.send(embed=e)
 
 @client.event
@@ -46,5 +46,5 @@ async def on_message(message):
     if message.content[1:].startswith("recruit"):
       try: await recruit(message.channel)
       except:
-          await review(message.channel, __import__('discord').Embed(color=0xff6600))
+          await review(message.channel, __import__('discord').Embed(color=0x506075))
     else: print(message.content[1:], 'is not a command')
