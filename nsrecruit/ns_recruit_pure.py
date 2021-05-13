@@ -35,9 +35,9 @@ async def review(channel, e):
     e.title, d_iter = "Run out of noobs.", done.__iter__()
     for i in range(len(done)//8+1):
       try:
-        e.add_field(name=str(i+1), value=', '.join([d_iter.__next__()for _ in range(8)]), inline=True)
+        e.add_field(name=str(i+1), value=', '.join([d_iter.__next__()for _ in range(8)]), inline=False)
       except StopIteration:
-        e.add_field(name=str(len(done)//8+1), value=', '.join(done[-(len(done)%8):]), inline=True)
+        e.add_field(name=str(len(done)//8+1), value=', '.join(done[-(len(done)%8):]), inline=False)
     await channel.send(embed=e)
 
 @client.event
