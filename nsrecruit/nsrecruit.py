@@ -21,7 +21,7 @@ class NSRecruit(commands.Cog):
     async def recruit(self, ctx):
         """Gives a list of up to 8 nations to send recruitment telegrams"""
 
-        h = await nsapi("happenings", limit="15", filter='founding')
+        h = await nsapi("happenings", limit="100", filter='founding')
         events = x2d.parse(pretty_string(h))["WORLD"]["HAPPENINGS"]["EVENT"]
 
         nations, e_iter = list(), events.__iter__()
